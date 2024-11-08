@@ -17,7 +17,7 @@ int fadeAmount2 = 5;
 // Variabile per gestire il ritardo tra i LED
 bool led1Acceso = false;
 unsigned long tempoLed1Acceso = 0;
-const int ritardoLed2 = 600;  // Ritardo di 500 ms per accendere il secondo LED
+const int ritardoLed2 = 600;  // Ritardo di 600 ms per accendere il secondo LED
 
 void setup() {
   // Impostazione dei pin
@@ -49,8 +49,8 @@ void loop() {
   Serial.print(distance);
   Serial.println(" cm");
 
-  // Accensione graduale dei LED se la distanza è inferiore a 20 cm
-  if (distance < 20) {
+  // Accensione graduale dei LED se la distanza è inferiore a 40 cm
+  if (distance < 40) {
     // Aumenta la luminosità gradualmente fino a 255, poi diminuisci per led1
     brightness1 += fadeAmount1;
 
@@ -75,9 +75,21 @@ void loop() {
       }
     }
   } else {
-    // Se la distanza non è inferiore a 20 cm, spegni i LED
-    brightness1 = 0;
-    brightness2 = 0;
+    // Se la distanza non è inferiore a 40 cm, diminuisci gradualmente la luminosità dei LED
+    if (brightness1 > 0) {
+      brightness1 -= fadeAmount1;
+      if (brightness1 < 0) {
+        brightness1 = 0;
+      }
+    }
+
+    if (brightness2 > 0) {
+      brightness2 -= fadeAmount2;
+      if (brightness2 < 0) {
+        brightness2 = 0;
+      }
+    }
+
     led1Acceso = false; // Resetta lo stato per la prossima accensione
   }
 
