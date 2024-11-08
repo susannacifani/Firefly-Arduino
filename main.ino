@@ -3,6 +3,7 @@ const int trigPin = 2;
 const int echoPin = 3;
 const int led1 = 9;
 const int led2 = 10;
+const int led3 = 11;  // Aggiunto terzo LED
 
 // Variabili per la distanza
 long duration;
@@ -11,8 +12,10 @@ int distance;
 // Variabili per l'intensità dei LED
 int brightness1 = 0;
 int brightness2 = 0;
+int brightness3 = 0;  // Luminosità per il terzo LED
 int fadeAmount1 = 5;  // Step di variazione della luminosità
 int fadeAmount2 = 5;
+int fadeAmount3 = 5;  // Step di variazione per il terzo LED
 
 // Variabile per gestire il ritardo tra i LED
 bool led1Acceso = false;
@@ -25,6 +28,7 @@ void setup() {
   pinMode(echoPin, INPUT);
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);  // Impostazione del terzo LED
 
   // Avvio della comunicazione seriale per debugging
   Serial.begin(9600);
@@ -74,6 +78,24 @@ void loop() {
         fadeAmount2 = -fadeAmount2;
       }
     }
+
+    // Accensione e fading del terzo LED se la distanza è inferiore a 20 cm
+    if (distance < 20) {
+      brightness3 += fadeAmount3;
+
+      // Inverte la direzione del fading se si raggiunge il limite per led3
+      if (brightness3 <= 0 || brightness3 >= 255) {
+        fadeAmount3 = -fadeAmount3;
+      }
+    } else {
+      // Se la distanza è maggiore di 20 cm, spegni gradualmente il terzo LED
+      if (brightness3 > 0) {
+        brightness3 -= fadeAmount3;
+        if (brightness3 < 0) {
+          brightness3 = 0;
+        }
+      }
+    }
   } else {
     // Se la distanza non è inferiore a 40 cm, diminuisci gradualmente la luminosità dei LED
     if (brightness1 > 0) {
@@ -90,12 +112,20 @@ void loop() {
       }
     }
 
+    if (brightness3 > 0) {
+      brightness3 -= fadeAmount3;
+      if (brightness3 < 0) {
+        brightness3 = 0;
+      }
+    }
+
     led1Acceso = false; // Resetta lo stato per la prossima accensione
   }
 
   // Imposta la luminosità per ogni LED
   analogWrite(led1, brightness1);
   analogWrite(led2, brightness2);
+  analogWrite(led3, brightness3);
 
   // Pausa breve per un fading graduale e evitare letture troppo frequenti
   delay(30);
