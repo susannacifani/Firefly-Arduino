@@ -22,8 +22,11 @@ int fadeAmount4 = 5;  // Step di variazione per il quarto LED
 
 // Variabile per gestire il ritardo tra i LED
 bool led1Acceso = false;
+bool led3Acceso = false; // Variabile per il ritardo di led4
 unsigned long tempoLed1Acceso = 0;
+unsigned long tempoLed3Acceso = 0;
 const int ritardoLed2 = 600;  // Ritardo di 600 ms per accendere il secondo LED
+const int ritardoLed4 = 600;  // Ritardo di 600 ms per accendere il quarto LED
 
 void setup() {
   // Impostazione dei pin
@@ -92,12 +95,20 @@ void loop() {
         fadeAmount3 = -fadeAmount3;
       }
 
-      // Accensione e fading del quarto LED
-      brightness4 += fadeAmount4;
+      // Salva il tempo in cui led3 ha iniziato ad accendersi
+      if (!led3Acceso) {
+        tempoLed3Acceso = millis();
+        led3Acceso = true;
+      }
 
-      // Inverte la direzione del fading se si raggiunge il limite per led4
-      if (brightness4 <= 0 || brightness4 >= 255) {
-        fadeAmount4 = -fadeAmount4;
+      // Accensione e fading del quarto LED solo dopo un ritardo specifico
+      if (millis() - tempoLed3Acceso >= ritardoLed4) {
+        brightness4 += fadeAmount4;
+
+        // Inverte la direzione del fading se si raggiunge il limite per led4
+        if (brightness4 <= 0 || brightness4 >= 255) {
+          fadeAmount4 = -fadeAmount4;
+        }
       }
     } else {
       // Se la distanza è maggiore di 20 cm, spegni gradualmente il terzo e quarto LED
@@ -114,6 +125,7 @@ void loop() {
           brightness4 = 0;
         }
       }
+      led3Acceso = false; // Resetta lo stato per la prossima accensione di led4
     }
   } else {
     // Se la distanza non è inferiore a 40 cm, spegni gradualmente tutti i LED
@@ -146,6 +158,7 @@ void loop() {
     }
 
     led1Acceso = false; // Resetta lo stato per la prossima accensione
+    led3Acceso = false; // Resetta lo stato per la prossima accensione di led4
   }
 
   // Imposta la luminosità per ogni LED
