@@ -11,7 +11,7 @@ int distance;
 // Variabili per l'intensità dei LED
 int brightness1 = 0;
 int brightness2 = 0;
-int fadeAmount1 = 15;  // Step di variazione della luminosità
+int fadeAmount1 = 5;  // Step di variazione della luminosità
 int fadeAmount2 = 5;
 
 void setup() {
@@ -46,19 +46,21 @@ void loop() {
 
   // Accensione graduale dei LED se la distanza è inferiore a 20 cm
   if (distance < 20) {
-    // Aumenta la luminosità gradualmente fino a 255 per LED1, poi per LED2
-    if (brightness1 < 255) {
-      brightness1 = min(brightness1 + fadeAmount1, 255);
-    } else if (brightness2 < 255) {
-      brightness2 = min(brightness2 + fadeAmount2, 255);
+    // Aumenta la luminosità gradualmente fino a 255, poi diminuisci
+    brightness1 += fadeAmount1;
+    brightness2 += fadeAmount2;
+
+    // Inverte la direzione del fading se si raggiunge il limite
+    if (brightness1 <= 0 || brightness1 >= 255) {
+      fadeAmount1 = -fadeAmount1;
+    }
+    if (brightness2 <= 0 || brightness2 >= 255) {
+      fadeAmount2 = -fadeAmount2;
     }
   } else {
-    // Diminuisci la luminosità gradualmente fino a 0 per LED2, poi per LED1
-    if (brightness2 > 0) {
-      brightness2 = max(brightness2 - fadeAmount2, 0);
-    } else if (brightness1 > 0) {
-      brightness1 = max(brightness1 - fadeAmount1, 0);
-    }
+    // Se la distanza non è inferiore a 20 cm, spegni i LED
+    brightness1 = 0;
+    brightness2 = 0;
   }
 
   // Imposta la luminosità per ogni LED
