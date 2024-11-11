@@ -23,6 +23,12 @@ bool fadeIn2 = true;
 bool fadeIn3 = true;
 bool fadeIn4 = true;
 
+// Stati di attivazione per la logica di isteresi
+bool led1_2_active = false;
+bool led3_4_active = false;
+
+const int hysteresis = 5; // Tolleranza di isteresi in cm
+
 void setup() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
@@ -73,8 +79,15 @@ void loop() {
   Serial.print(distance);
   Serial.println(" cm");
 
-  // Gestione del fading continuo per i LED in base alla distanza
-  if (distance < 40) {
+  // Gestione dell'isteresi e del fading continuo per i LED
+  // Gestione LED 1 e 2
+  if (distance < 45 - hysteresis) {
+    led1_2_active = true;
+  } else if (distance > 45 + hysteresis) {
+    led1_2_active = false;
+  }
+
+  if (led1_2_active) {
     fade(brightness1, led1, fadeIn1);
     fade(brightness2, led2, fadeIn2);
   } else {
@@ -82,7 +95,14 @@ void loop() {
     fadeOutOnly(brightness2, led2);
   }
 
-  if (distance < 20) {
+  // Gestione LED 3 e 4
+  if (distance < 25 - hysteresis) {
+    led3_4_active = true;
+  } else if (distance > 25 + hysteresis) {
+    led3_4_active = false;
+  }
+
+  if (led3_4_active) {
     fade(brightness3, led3, fadeIn3);
     fade(brightness4, led4, fadeIn4);
   } else {
